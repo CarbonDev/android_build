@@ -68,13 +68,13 @@ TARGET_NO_UNDEFINED_LDFLAGS := -Wl,--no-undefined
 ifeq ($(TARGET_USE_O2),true)
 TARGET_arm_CFLAGS :=    -Os \
                         -fomit-frame-pointer \
-                        -fstrict-aliasing
+                        -fstrict-aliasing    \
+                        -fno-tree-vectorize
 else
 TARGET_arm_CFLAGS :=    -O3 \
                         -fomit-frame-pointer \
                         -fstrict-aliasing    \
-                        -funswitch-loops     \
-                        -fno-tree-vectorize
+                        -funswitch-loops
 endif
 # Modules can choose to compile some source as thumb. As
 # non-thumb enabled targets are supported, this is treated
@@ -85,7 +85,8 @@ ifeq ($(ARCH_ARM_HAVE_THUMB_SUPPORT),true)
     TARGET_thumb_CFLAGS :=  -mthumb \
                             -O2 \
                             -fomit-frame-pointer \
-                            -fno-strict-aliasing
+                            -fno-strict-aliasing \
+                            -fno-tree-vectorize
     else
     TARGET_thumb_CFLAGS :=  -mthumb \
                             -O3 \
@@ -93,8 +94,7 @@ ifeq ($(ARCH_ARM_HAVE_THUMB_SUPPORT),true)
                             -funsafe-math-optimizations \
                             -fstrict-aliasing \
                             -Wstrict-aliasing=2 \
-                            -Werror=strict-aliasing \
-                            -fno-tree-vectorize
+                            -Werror=strict-aliasing
     endif
 else
 TARGET_thumb_CFLAGS := $(TARGET_arm_CFLAGS)
