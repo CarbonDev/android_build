@@ -74,7 +74,7 @@ else
 TARGET_arm_CFLAGS :=    -O3 \
                         -fomit-frame-pointer \
                         -fstrict-aliasing    \
-                        -fno-tree-vectorize
+                        -funswitch-loops
 endif
 # Modules can choose to compile some source as thumb. As
 # non-thumb enabled targets are supported, this is treated
@@ -91,8 +91,10 @@ ifeq ($(ARCH_ARM_HAVE_THUMB_SUPPORT),true)
     TARGET_thumb_CFLAGS :=  -mthumb \
                             -O3 \
                             -fomit-frame-pointer \
-                            -fno-strict-aliasing \
-                            -fno-tree-vectorize
+                            -funsafe-math-optimizations \
+                            -fstrict-aliasing \
+                            -Wstrict-aliasing=2 \
+                            -Werror=strict-aliasing
     endif
 else
 TARGET_thumb_CFLAGS := $(TARGET_arm_CFLAGS)
