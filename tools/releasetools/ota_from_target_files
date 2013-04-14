@@ -96,7 +96,7 @@ OPTIONS.omit_prereq = False
 OPTIONS.extra_script = None
 OPTIONS.aslr_mode = True
 OPTIONS.worker_threads = 3
-OPTIONS.override_device = 'auto
+OPTIONS.override_device = 'auto'
 OPTIONS.backuptool = False 
 
 def MostPopularKey(d, default):
