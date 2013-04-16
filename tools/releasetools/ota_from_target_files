@@ -55,6 +55,9 @@ Usage:  ota_from_target_files [flags] input_target_files output_ota_package
   --override_device <device>
       Override device-specific asserts. Can be a comma-separated list.
 
+  --no_assert <true|false>
+      Including this will turn device asserts off.
+
   --backup <boolean>
       Enable or disable the execution of backuptool.sh.
       Disabled by default.
@@ -97,6 +100,7 @@ OPTIONS.extra_script = None
 OPTIONS.aslr_mode = True
 OPTIONS.worker_threads = 3
 OPTIONS.override_device = 'auto'
+OPTIONS.no_assert = False
 OPTIONS.backuptool = False 
 
 def MostPopularKey(d, default):
@@ -398,12 +402,10 @@ def WriteFullOTAPackage(input_zip, output_zip):
       metadata=metadata,
       info_dict=OPTIONS.info_dict)
 
-  #if not OPTIONS.omit_prereq:
-  # ts = GetBuildProp("ro.build.date.utc", OPTIONS.info_dict)
-  # script.AssertOlderBuild(ts)
+  if not OPTIONS.no_assert:
+    #AppendAssertions(script, OPTIONS.info_dict)
+	device_specific.FullOTA_Assertions()
 
-  AppendAssertions(script, OPTIONS.info_dict)
-  device_specific.FullOTA_Assertions()
   device_specific.FullOTA_InstallBegin()
 
   if OPTIONS.backuptool:
