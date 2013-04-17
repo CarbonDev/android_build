@@ -418,6 +418,17 @@ def WriteFullOTAPackage(input_zip, output_zip):
   if OPTIONS.wipe_user_data:
     script.FormatPartition("/data")
 
+  script.Print("*********************************************************");
+  script.Print("*   *****         *  ******   ****   ****** **      *   *");
+  script.Print("*  *             **  *    *   *   *  *    * ***     *   *");
+  script.Print("* *             * *  *   *    *    * *    * *  *    *   *");
+  script.Print("* *            *  *  *  *     *   *  *    * *   *   *   *");
+  script.Print("* *           *****  * *      * * *  *    * *    *  *   *");
+  script.Print("*  *         *    *  *  *     *   *  *    * *     * *   *");
+  script.Print("*   *       *     *  *    *   *    * *    * *      **   *");
+  script.Print("*    ***** *      *  *      * *****  ****** *       *   *");
+  script.Print("*********************************************************");
+
   script.Print("Erasing System...")
 
   if "selinux_fc" in OPTIONS.info_dict:
@@ -873,3 +884,4 @@ if __name__ == '__main__':
     print "   ERROR: %s" % (e,)
     print
     sys.exit(1)
+
