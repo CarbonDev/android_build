@@ -1347,8 +1347,6 @@ else
 	@echo -e ${CL_YLW}"Running vendor releasetool..."${CL_RST}
 	$(hide) OTAPACKAGE=$(INTERNAL_OTA_PACKAGE_TARGET) APKCERTS=$(APKCERTS_FILE) ./vendor/carbon/tools/squisher
 endif
-	@echo -e ${CL_YLW}"Running changelog generator..."${CL_RST}
-	$(hide) ./vendor/carbon/tools/changelog_gen
 
 # -----------------------------------------------------------------
 # The update package
