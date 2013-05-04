@@ -646,7 +646,7 @@ function tapas()
 function eat()
 {
     if [ "$OUT" ] ; then
-        MODVERSION=`sed -n -e'/ro\.carbon\.version/s/.*=//p' $OUT/system/build.prop`
+        MODVERSION=$(get_build_var CARBON_VERSION)
         ZIPFILE=carbon-$MODVERSION.zip
         ZIPPATH=$OUT/$ZIPFILE
         if [ ! -f $ZIPPATH ] ; then
