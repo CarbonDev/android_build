@@ -91,8 +91,7 @@ ifeq ($(ARCH_ARM_HAVE_THUMB_SUPPORT),true)
     TARGET_thumb_CFLAGS :=  -mthumb \
                             -Os \
                             -fomit-frame-pointer \
-                            -fno-strict-aliasing \
-                            -fno-tree-vectorize
+                            -fno-strict-aliasing
     endif
 else
 TARGET_thumb_CFLAGS := $(TARGET_arm_CFLAGS)
@@ -112,17 +111,25 @@ ifeq ($(FORCE_ARM_DEBUGGING),true)
   TARGET_thumb_CFLAGS += -marm -fno-omit-frame-pointer
 endif
 
+ifeq ($(TARGET_DISABLE_ARM_PIE),true)
+   PIE_GLOBAL_CFLAGS :=
+   PIE_EXECUTABLE_TRANSFORM := -Wl,-T,$(BUILD_SYSTEM)/armelf.x
+else
+   PIE_GLOBAL_CFLAGS := -fPIE
+   PIE_EXECUTABLE_TRANSFORM := -fPIE -pie
+endif
+
 TARGET_GLOBAL_CFLAGS += \
-      -msoft-float -fpic -fPIE \
-      -ffunction-sections \
-      -fdata-sections \
-      -funwind-tables \
-      -fstack-protector \
-      -Wa,--noexecstack \
-      -Werror=format-security \
-      -D_FORTIFY_SOURCE=1 \
-      -fno-short-enums \
-      $(arch_variant_cflags)
+			-msoft-float -fpic $(PIE_GLOBAL_CFLAGS) \
+			-ffunction-sections \
+			-fdata-sections \
+			-funwind-tables \
+			-fstack-protector \
+			-Wa,--noexecstack \
+			-Werror=format-security \
+			-D_FORTIFY_SOURCE=1 \
+			-fno-short-enums \
+			$(arch_variant_cflags)
 
 android_config_h := $(call select-android-config-h,linux-arm)
 TARGET_ANDROID_CONFIG_CFLAGS := -include $(android_config_h) -I $(dir $(android_config_h))
