@@ -71,7 +71,7 @@ def add_auth(githubreq):
 
 page = 1
 while not depsonly:
-    githubreq = urllib2.Request("https://api.github.com/users/CarbonDev/repos?per_page=100")
+    githubreq = urllib2.Request("https://api.github.com/users/CarbonDev/repos?per_page=100&page=%d" % page)
     add_auth(githubreq)
     result = json.loads(urllib2.urlopen(githubreq).read())
     if len(result) == 0:
