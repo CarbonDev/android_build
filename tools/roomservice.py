@@ -215,7 +215,7 @@ def fetch_vendors(repo_path):
     vendor_repos = [
         {
             'target_path': 'vendor/%s' % vendor,
-            'repository' : 'CarbonDev/android_vendor_%s' % vendor,
+            'repository' : 'android_vendor_%s' % vendor,
             'dep_type'   : 'vendor'
         },
     ]
