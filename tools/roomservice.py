@@ -162,7 +162,7 @@ def add_to_manifest(repositories):
 
         print ('Adding dependency: %s -> %s' % (repo_name, repo_target))
         project = ElementTree.Element("project", attrib = { "path": repo_target,
-            "remote": "gh", "name": "CarbonDev/%s" % repo_name })
+            "remote": "gh", "name": "%s" % repo_name })
 
         if 'branch' in repository:
             project.set('revision',repository['branch'])
@@ -247,8 +247,8 @@ else:
             manufacturer = repo_name.replace("android_device_", "").replace("_" + device, "")
 
             repo_path = "device/%s/%s" % (manufacturer, device)
-
-            add_to_manifest([{'repository':repo_name,
+	    final_name = "CarbonDev/" + repo_name
+            add_to_manifest([{'repository':final_name,
                               'target_path':repo_path,
                               'dep_type':'device'}])
 
