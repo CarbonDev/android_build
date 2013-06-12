@@ -162,7 +162,7 @@ def add_to_manifest(repositories):
 
         print ('Adding dependency: %s -> %s' % (repo_name, repo_target))
         project = ElementTree.Element("project", attrib = { "path": repo_target,
-            "remote": "gh", "name": "%s" % repo_name })
+            "remote": "gh", "name": "CarbonDev/%s" % repo_name })
 
         if 'branch' in repository:
             project.set('revision',repository['branch'])
@@ -215,7 +215,7 @@ def fetch_vendors(repo_path):
     vendor_repos = [
         {
             'target_path': 'vendor/%s' % vendor,
-            'repository' : 'android_vendor_%s' % vendor,
+            'repository' : 'CarbonDev/android_vendor_%s' % vendor,
             'dep_type'   : 'vendor'
         },
     ]
