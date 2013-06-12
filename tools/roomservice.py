@@ -208,19 +208,6 @@ def fetch_children(repos):
     fetch_repos(children)
     return children
 
-def fetch_vendors(repo_path):
-    '''Add the proper vendor dependency'''
-
-    vendor = repo_path.split('/')[1]
-    vendor_repos = [
-        {
-            'target_path': 'vendor/%s' % vendor,
-            'repository' : 'android_vendor_%s' % vendor,
-            'dep_type'   : 'vendor'
-        },
-    ]
-    fetch_repos(vendor_repos)
-
 def fetch_dependencies(repo_path):
     '''Add any and all dependencies found'''
 
@@ -242,8 +229,6 @@ def fetch_dependencies(repo_path):
         if not children:
             break
 
-    # Fetch vendor dependencies
-    fetch_vendors(repo_path)
 
 if depsonly:
     repo_path = get_from_manifest(device)
