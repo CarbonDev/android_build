@@ -546,6 +546,8 @@ function lunch()
     elif (echo -n $answer | grep -q -e "^[^\-][^\-]*-[^\-][^\-]*$")
     then
         selection=$answer
+    else #It is likely just the board name, assemble the combo for us
+        selection=ev_${answer}-eng
     fi
 
     if [ -z "$selection" ]
@@ -559,6 +561,17 @@ function lunch()
 
     local product=$(echo -n $selection | sed -e "s/-.*$//")
     check_product $product
+    if [ $? -ne 0 ]
+    then
+        # if we can't find a product, try to grab it off the Evervolv github
+        T=$(gettop)
+        pushd $T > /dev/null
+        build/tools/roomservice.py $product
+        popd > /dev/null
+        check_product $product
+    else
+        build/tools/roomservice.py $product true
+    fi
     if [ $? -ne 0 ]
     then
         echo
