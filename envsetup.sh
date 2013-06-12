@@ -193,8 +193,6 @@ function setpaths()
     unset OPROFILE_EVENTS_DIR
     export OPROFILE_EVENTS_DIR=$T/external/oprofile/events
 
-    unset ROOMSERVICE_BRANCHES
-    export ROOMSERVICE_BRANCHES="carbon"
     # needed for building linux on MacOS
     # TODO: fix the path
     #export HOST_EXTRACFLAGS="-I "$T/system/kernel_headers/host_include
