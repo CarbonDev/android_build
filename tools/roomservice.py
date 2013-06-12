@@ -141,12 +141,11 @@ def is_in_manifest(projectname):
 
     return None
 
-def add_to_manifest(repositories):
+def add_to_manifest(repositories, fallback_branch = None):
     for repository in repositories:
         if 'dep_type' in repository:
             dep_manifest = os.path.join(local_manifests_dir, repository['dep_type'] + ".xml")
         else:
-            print ('dep_type not found, assuming device tree, otherwise please update your carbon.dependencies config')
             dep_manifest = os.path.join(local_manifests_dir, "device.xml")
         try:
             lm = ElementTree.parse(dep_manifest)
@@ -164,10 +163,13 @@ def add_to_manifest(repositories):
         project = ElementTree.Element("project", attrib = { "path": repo_target,
             "remote": "gh", "name": "CarbonDev/%s" % repo_name })
 
-        if 'branch' in repository:
+	if 'branch' in repository:
             project.set('revision',repository['branch'])
+        elif fallback_branch:
+            print("Using fallback branch %s for %s" % (fallback_branch, repo_name))
+            project.set('revision', fallback_branch)
         else:
-            project.set('revision',default_revison)
+            print("Using default branch for %s" % repo_name)
 
         lm.append(project)
 
@@ -208,20 +210,7 @@ def fetch_children(repos):
     fetch_repos(children)
     return children
 
-def fetch_vendors(repo_path):
-    '''Add the proper vendor dependency'''
-
-    vendor = repo_path.split('/')[1]
-    vendor_repos = [
-        {
-            'target_path': 'vendor/%s' % vendor,
-            'repository' : 'android_vendor_%s' % vendor,
-            'dep_type'   : 'vendor'
-        },
-    ]
-    fetch_repos(vendor_repos)
-
-def fetch_dependencies(repo_path):
+def fetch_dependencies(repo_path, fallback_branch = None):
     '''Add any and all dependencies found'''
 
     dependencies = []
@@ -242,8 +231,6 @@ def fetch_dependencies(repo_path):
         if not children:
             break
 
-    # Fetch vendor dependencies
-    fetch_vendors(repo_path)
 
 if depsonly:
     repo_path = get_from_manifest(device)
@@ -263,15 +250,35 @@ else:
 
             repo_path = "device/%s/%s" % (manufacturer, device)
 
+
+	fallback_branch = None
+            if not has_branch(result, default_revision):
+                if os.getenv('ROOMSERVICE_BRANCHES'):
+                    fallbacks = list(filter(bool, os.getenv('ROOMSERVICE_BRANCHES').split(' ')))
+                    for fallback in fallbacks:
+                        if has_branch(result, fallback):
+                            print("Using fallback branch: %s" % fallback)
+                            fallback_branch = fallback
+                            break
+
+                if not fallback_branch:
+                    print("Default revision %s not found in %s. Bailing." % (default_revision, repo_name))
+                    print("Branches found:")
+                    for branch in [branch['name'] for branch in result]:
+                        print(branch)
+                    print("Use the ROOMSERVICE_BRANCHES environment variable to specify a list of fallback branches.")
+                    sys.exit()
+
             add_to_manifest([{'repository':repo_name,
                               'target_path':repo_path,
-                              'dep_type':'device'}])
+                              'dep_type':'device'}], fallback_branch)
+
 
             print ("Syncing repository to retrieve project.")
             os.system('repo sync -f %s' % repo_path)
             print ("Repository synced!")
 
-            fetch_dependencies(repo_path)
+            fetch_dependencies(repo_path, fallback_branch)
             print ("Done")
             sys.exit()
 
