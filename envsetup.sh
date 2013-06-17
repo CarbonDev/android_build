@@ -546,8 +546,9 @@ function lunch()
     elif (echo -n $answer | grep -q -e "^[^\-][^\-]*-[^\-][^\-]*$")
     then
         selection=$answer
-    else #It is likely just the board name, assemble the combo for us
-        selection=ev_${answer}-eng
+# Removing roomservice for now; need to have a mani that works with it.
+#    else #It is likely just the board name, assemble the combo for us
+#        selection=ev_${answer}-eng
     fi
 
     if [ -z "$selection" ]
@@ -563,17 +564,18 @@ function lunch()
     check_product $product
     if [ $? -ne 0 ]
     then
+# Removing roomservice for now; need to have a mani that works with it.
         # if we can't find a product, try to grab it off the CarbonDev github
-        T=$(gettop)
-        pushd $T > /dev/null
-        build/tools/roomservice.py $product
-        popd > /dev/null
-        check_product $product
-    else
-        build/tools/roomservice.py $product true
-    fi
-    if [ $? -ne 0 ]
-    then
+#        T=$(gettop)
+#        pushd $T > /dev/null
+#        build/tools/roomservice.py $product
+#        popd > /dev/null
+#        check_product $product
+#    else
+#        build/tools/roomservice.py $product true
+#    fi
+#    if [ $? -ne 0 ]
+#    then
         echo
         echo "** Don't have a product spec for: '$product'"
         echo "** Do you have the right repo manifest?"
