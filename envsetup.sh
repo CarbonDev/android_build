@@ -256,27 +256,25 @@ function settitle()
 
 function addcompletions()
 {
+    local T dir f
+
     # Keep us from trying to run in something that isn't bash.
     if [ -z "${BASH_VERSION}" ]; then
         return
     fi
 
     # Keep us from trying to run in bash that's too old.
-    if [ "${BASH_VERSINFO[0]}" -lt 4 ] ; then
+    if [ ${BASH_VERSINFO[0]} -lt 3 ]; then
         return
     fi
 
-    local T dir f
-
-    dirs="sdk/bash_completion vendor/carbon/bash_completion"
-    for dir in $dirs; do
+    dir="sdk/bash_completion"
     if [ -d ${dir} ]; then
         for f in `/bin/ls ${dir}/[a-z]*.bash 2> /dev/null`; do
             echo "including $f"
             . $f
         done
     fi
-    done
 }
 
 function choosetype()
