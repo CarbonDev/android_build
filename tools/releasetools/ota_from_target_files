@@ -415,12 +415,41 @@ def WriteFullOTAPackage(input_zip, output_zip):
   if OPTIONS.wipe_user_data:
     script.FormatPartition("/data")
 
+  script.Print("                                        ");
+  script.Print("                8OOOO8                  ");
+  script.Print("           88888O88O888888D             ");
+  script.Print("         88888888888888888888           ");
+  script.Print("       8888888888888888888888D8         ");
+  script.Print("     8DD8888888888888888888D8DDD        ");
+  script.Print("    DDDDDD8888888888888888DDDD          ");
+  script.Print("   DDDDDDDD8           NDDDD8           ");
+  script.Print("   DDDDDD                 D             ");
+  script.Print("  DDDDDD N                              ");
+  script.Print("  DDDD  NN                              ");
+  script.Print("  NND  NNN                              ");
+  script.Print("  NNN NNNN                              ");
+  script.Print("  NN  NNNN                              ");
+  script.Print("  NN NNNNDN                             ");
+  script.Print("   N NNNDNN8                        D   ");
+  script.Print("   N NNDN  D8                     NN    ");
+  script.Print("    N 8  D8  DD                  DD8    ");
+  script.Print("      NNN   DD  DN                      ");
+  script.Print("          DDN  DDN  NDDDDD              ");
+  script.Print("         NNN  NDD8   DDDDDD             ");
+  script.Print("              DDD    DDDDDDD            ");
+  script.Print("              DDD    DDDDND             ");
+  script.Print("                                        ");
+  script.Print("                                        ");
+
   if "selinux_fc" in OPTIONS.info_dict:
     WritePolicyConfig(OPTIONS.info_dict["selinux_fc"], output_zip)
 
+  script.Print("Formating System...")
   script.FormatPartition("/system")
+  script.Print("Mounting System...")
   script.Mount("/system")
   #script.UnpackPackageDir("recovery", "/system")
+  script.Print("Installing System...")
   script.UnpackPackageDir("system", "/system")
 
   symlinks = CopySystemFiles(input_zip, output_zip)
