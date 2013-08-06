@@ -1401,17 +1401,14 @@ $(INTERNAL_OTA_PACKAGE_TARGET): $(BUILT_TARGET_FILES_PACKAGE) $(DISTTOOLS)
 	   --backup=$(backuptool) \
 	   $(BUILT_TARGET_FILES_PACKAGE) $@
 
-CARBON_TARGET_PACKAGE := $(PRODUCT_OUT)/$(CARBON_VERSION).zip
-
 .PHONY: otapackage carbon
 otapackage: $(INTERNAL_OTA_PACKAGE_TARGET)
 carbon: otapackage
 ifneq ($(TARGET_CUSTOM_RELEASETOOL),)
 	$(error TARGET_CUSTOM_RELEASETOOL is deprecated)
 endif
-	$(hide) ln -f $(INTERNAL_OTA_PACKAGE_TARGET) $(CARBON_TARGET_PACKAGE)
-	$(hide) $(MD5SUM) $(CARBON_TARGET_PACKAGE) > $(CARBON_TARGET_PACKAGE).md5sum
-	@echo -e ${CL_CYN}"Package Complete: $(CARBON_TARGET_PACKAGE)"${CL_RST}
+	@echo -e ${CL_YLW}"Running vendor releasetool..."${CL_RST}
+	$(hide) OTAPACKAGE=$(INTERNAL_OTA_PACKAGE_TARGET) APKCERTS=$(APKCERTS_FILE) ./vendor/carbon/tools/squisher
 
 # -----------------------------------------------------------------
 # The update package
