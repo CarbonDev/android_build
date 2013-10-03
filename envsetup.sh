@@ -72,7 +72,7 @@ function check_product()
 
     if (echo -n $1 | grep -q -e "^carbon_") ; then
        CARBON_BUILD=$(echo -n $1 | sed -e 's/^carbon_//g')
-       export BUILD_NUMBER=$((date +%s%N ; echo $CARBON_BUILD; hostname) | sha1sum | cut -c1-10)
+       export BUILD_NUMBER=$((date +%s%N ; echo $CARBON_BUILD; hostname) | openssl sha1 | sed -e 's/.*=//g; s/ //g' | cut -c1-10)
     else
        CARBON_BUILD=
     fi
