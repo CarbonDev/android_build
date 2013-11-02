@@ -25,12 +25,14 @@ PRODUCT_PACKAGES := \
 	FusedLocation \
 	Gallery \
 	Apollo \
+	Keyguard \
 	Mms \
 	OpenWnn \
+	PrintSpooler \
 	libWnnEngDic \
 	libWnnJpnDic \
 	libwnndict \
-	Phone \
+	TeleService \
 	PinyinIME \
 	libjni_pinyinime \
 	SoftKeyboard \
@@ -38,7 +40,6 @@ PRODUCT_PACKAGES := \
 	Trebuchet \
 	Development \
 	DevelopmentSettings \
-	DrmProvider \
 	Fallback \
 	Settings \
 	SdkSetup \
