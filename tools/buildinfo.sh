@@ -45,3 +45,39 @@ echo "ro.build.characteristics=$TARGET_AAPT_CHARACTERISTICS"
 echo "ro.carbon.device=$MINIONS_DEVICE"
 
 echo "# end build properties"
+
+echo "#Mgbotoe Minions Edit"
+
+echo "#Better Scrolling"
+echo "windowsmgr.max_events_per_sec=300"
+echo "ro.max.fling_velocity=12000"
+echo "ro.min.fling_velocity=8000"
+
+echo "#Better Battery"
+echo "ro.ril.disable.power.collapse=1"
+echo "wifi.supplicant_scan_interval=200"
+echo "windowsmgr.max_events_per_sec=60"
+echo "persist.sys.purgeable_assets=1"
+echo "ro.config.hw_fast_dormancy=1"
+echo "ro.config.hw_power_saving=1"
+echo "pm.sleep_mode=1" 
+
+echo "#Dalvik VM Tweaks"
+echo "dalvik.vm.startheapsize=8M"
+echo "dalvik.vm.dexopt-flags=m=y"
+echo "dalvik.vm.execution-mode=init:jit"
+echo "ro.kernel.android.checkjni=0"
+echo "ro.kernel.checkjni=0" 
+
+echo "#Error Disabled" 
+echo "profiler.force_disable_err_rpt=1"
+echo "profiler.force_disable_ulog=1"
+echo "ro.kernel.android.checkjni=0"
+echo "ro.kernel.checkjni=0"
+
+echo "#Disable Blackscreen"
+echo "ro.lge.proximity.delay=25"
+echo "mot.proximity.delay=25"
+
+echo "#launcher"
+echo "ro.HOME_APP_ADJ = 1"
