@@ -71,13 +71,13 @@ function check_product()
         return
     fi
 
-    if (echo -n $1 | grep -q -e "^carbon_") ; then
-       CARBON_BUILD=$(echo -n $1 | sed -e 's/^carbon_//g')
-       export BUILD_NUMBER=$((date +%s%N ; echo $CARBON_BUILD; hostname) | openssl sha1 | sed -e 's/.*=//g; s/ //g' | cut -c1-10)
+    if (echo -n $1 | grep -q -e "^minions_") ; then
+       MINIONS_BUILD=$(echo -n $1 | sed -e 's/^minions_//g')
+       export BUILD_NUMBER=$((date +%s%N ; echo $MINIONS_BUILD; hostname) | openssl sha1 | sed -e 's/.*=//g; s/ //g' | cut -c1-10)
     else
-       CARBON_BUILD=
+       MINIONS_BUILD=
     fi
-    export CARBON_BUILD
+    export MINIONS_BUILD
 
     CALLED_FROM_SETUP=true BUILD_SYSTEM=build/core \
         TARGET_PRODUCT=$1 \
@@ -464,7 +464,7 @@ function print_lunch_menu()
        echo "  (ohai, koush!)"
     fi
     echo
-    if [ "z${CARBON_DEVICES_ONLY}" != "z" ]; then
+    if [ "z${MINIONS_DEVICES_ONLY}" != "z" ]; then
        echo "Breakfast menu... pick a combo:"
     else
        echo "Lunch menu... pick a combo:"
@@ -478,7 +478,7 @@ function print_lunch_menu()
         i=$(($i+1))
     done | column
 
-    if [ "z${CARBON_DEVICES_ONLY}" != "z" ]; then
+    if [ "z${MINIONS_DEVICES_ONLY}" != "z" ]; then
        echo "... and don't forget the bacon!"
     fi
 
@@ -489,7 +489,7 @@ function brunch()
 {
     breakfast $*
     if [ $? -eq 0 ]; then
-        mka carbon
+        mka minions
     else
         echo "No such item in brunch menu. Try 'breakfast'"
         return 1
@@ -500,10 +500,10 @@ function brunch()
 function breakfast()
 {
     target=$1
-    CARBON_DEVICES_ONLY="true"
+    MINIONS_DEVICES_ONLY="true"
     unset LUNCH_MENU_CHOICES
     add_lunch_combo full-eng
-    for f in `/bin/ls vendor/carbon/vendorsetup.sh 2> /dev/null`
+    for f in `/bin/ls vendor/minions/vendorsetup.sh 2> /dev/null`
         do
             echo "including $f"
             . $f
@@ -519,8 +519,8 @@ function breakfast()
             # A buildtype was specified, assume a full device name
             lunch $target
         else
-            # This is probably just the Carbon model name
-            lunch carbon_$target-userdebug
+            # This is probably just the Minions model name
+            lunch minions_$target-userdebug
         fi
     fi
     return $?
@@ -670,7 +670,7 @@ function eat()
 {
     if [ "$OUT" ] ; then
         MODVERSION=$(get_build_var CCARBON_VERSION)
-        ZIPFILE=carbon-$MODVERSION.zip
+        ZIPFILE=minions-$MODVERSION.zip
         ZIPPATH=$OUT/$ZIPFILE
         if [ ! -f $ZIPPATH ] ; then
             echo "Nothing to eat"
@@ -685,7 +685,7 @@ function eat()
             done
             echo "Device Found.."
         fi
-    if (adb shell cat /system/build.prop | grep -q "ro.carbon.device=$CARBON_BUILD");
+    if (adb shell cat /system/build.prop | grep -q "ro.carbon.device=$MINIONS_BUILD");
     then
         # if adbd isn't root we can't write to /cache/recovery/
         adb root
@@ -714,7 +714,7 @@ EOF
     fi
     return $?
     else
-        echo "The connected device does not appear to be $CARBON_BUILD, run away!"
+        echo "The connected device does not appear to be $MINIONS_BUILD, run away!"
     fi
 }
 
@@ -1597,7 +1597,7 @@ function installboot()
     sleep 1
     adb wait-for-online shell mount /system 2>&1 > /dev/null
     adb wait-for-online remount
-    if (adb shell cat /system/build.prop | grep -q "ro.carbon.device=$CARBON_BUILD");
+    if (adb shell cat /system/build.prop | grep -q "ro.carbon.device=$MINIONS_BUILD");
     then
         adb push $OUT/boot.img /cache/
         for i in $OUT/system/lib/modules/*;
@@ -1613,7 +1613,7 @@ function installboot()
         adb shell chmod 644 /system/lib/modules/*
         echo "Installation complete."
     else
-        echo "The connected device does not appear to be $CARBON_BUILD, run away!"
+        echo "The connected device does not appear to be $MINIONS_BUILD, run away!"
     fi
 }
 
@@ -1647,13 +1647,13 @@ function installrecovery()
     sleep 1
     adb wait-for-online shell mount /system 2>&1 >> /dev/null
     adb wait-for-online remount
-    if (adb shell cat /system/build.prop | grep -q "ro.carbon.device=$CARBON_BUILD");
+    if (adb shell cat /system/build.prop | grep -q "ro.carbon.device=$MINIONS_BUILD");
     then
         adb push $OUT/recovery.img /cache/
         adb shell dd if=/cache/recovery.img of=$PARTITION
         echo "Installation complete."
     else
-        echo "The connected device does not appear to be $CARBON_BUILD, run away!"
+        echo "The connected device does not appear to be $MINIONS_BUILD, run away!"
     fi
 }
 
@@ -1704,7 +1704,7 @@ function dopush()
         echo "Device Found."
     fi
 
-    if (adb shell cat /system/build.prop | grep -q "ro.carbon.device=$CARBON_BUILD");
+    if (adb shell cat /system/build.prop | grep -q "ro.carbon.device=$MINIONS_BUILD");
     then
     # retrieve IP and PORT info if we're using a TCP connection
     TCPIPPORT=$(adb devices | egrep '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:[0-9]+[^0-9]+' \
@@ -1755,7 +1755,7 @@ function dopush()
     rm -f $OUT/.log
     return 0
     else
-        echo "The connected device does not appear to be $CARBON_BUILD, run away!"
+        echo "The connected device does not appear to be $MINIONS_BUILD, run away!"
     fi
 }
 
@@ -1835,7 +1835,7 @@ unset f
 
 # Add completions
 check_bash_version && {
-    dirs="sdk/bash_completion vendor/carbon/bash_completion"
+    dirs="sdk/bash_completion vendor/minions/bash_completion"
     for dir in $dirs; do
     if [ -d ${dir} ]; then
         for f in `/bin/ls ${dir}/[a-z]*.bash 2> /dev/null`; do
