@@ -23,7 +23,7 @@ TARGET_ARCH_VARIANT := x86
 endif
 
 ifeq ($(strip $(TARGET_GCC_VERSION_EXP)),)
-TARGET_GCC_VERSION := 4.7
+TARGET_GCC_VERSION := 4.8
 else
 TARGET_GCC_VERSION := $(TARGET_GCC_VERSION_EXP)
 endif
@@ -42,8 +42,8 @@ include $(TARGET_ARCH_SPECIFIC_MAKEFILE)
 
 # You can set TARGET_TOOLS_PREFIX to get gcc from somewhere else
 ifeq ($(strip $(TARGET_TOOLS_PREFIX)),)
-TARGET_TOOLCHAIN_ROOT := prebuilts/gcc/$(HOST_PREBUILT_TAG)/x86/i686-linux-android-$(TARGET_GCC_VERSION)
-TARGET_TOOLS_PREFIX := $(TARGET_TOOLCHAIN_ROOT)/bin/i686-linux-android-
+TARGET_TOOLCHAIN_ROOT := prebuilts/gcc/$(HOST_PREBUILT_TAG)/x86/x86_64-linux-android-$(TARGET_GCC_VERSION)
+TARGET_TOOLS_PREFIX := $(TARGET_TOOLCHAIN_ROOT)/bin/x86_64-linux-android-
 endif
 
 TARGET_CC := $(TARGET_TOOLS_PREFIX)gcc$(HOST_EXECUTABLE_SUFFIX)
@@ -63,6 +63,8 @@ endif
 ifneq ($(wildcard $(TARGET_CC)),)
 TARGET_LIBGCC := \
 	$(shell $(TARGET_CC) -m32 -print-file-name=libgcc.a)
+target_libgcov := $(shell $(TARGET_CC) $(TARGET_GLOBAL_CFLAGS) \
+	-print-file-name=libgcov.a)
 endif
 
 TARGET_NO_UNDEFINED_LDFLAGS := -Wl,--no-undefined
@@ -72,6 +74,34 @@ libm_root := bionic/libm
 libstdc++_root := bionic/libstdc++
 libthread_db_root := bionic/libthread_db
 
+# Define FDO (Feedback Directed Optimization) options.
+
+TARGET_FDO_CFLAGS:=
+TARGET_FDO_LIB:=
+
+ifneq ($(strip $(BUILD_FDO_INSTRUMENT)),)
+  # Set BUILD_FDO_INSTRUMENT=true to turn on FDO instrumentation.
+  # The profile will be generated on /data/local/tmp/profile on the device.
+  TARGET_FDO_CFLAGS := -fprofile-generate=/data/local/tmp/profile -DANDROID_FDO
+  TARGET_FDO_LIB := $(target_libgcov)
+else
+  # If BUILD_FDO_INSTRUMENT is turned off, then consider doing the FDO optimizations.
+  # Set TARGET_FDO_PROFILE_PATH to set a custom profile directory for your build.
+  ifeq ($(strip $(TARGET_FDO_PROFILE_PATH)),)
+    TARGET_FDO_PROFILE_PATH := fdo/profiles/$(TARGET_ARCH)/$(TARGET_ARCH_VARIANT)
+  else
+    ifeq ($(strip $(wildcard $(TARGET_FDO_PROFILE_PATH))),)
+      $(warning Custom TARGET_FDO_PROFILE_PATH supplied, but directory does not exist. Turn off FDO.)
+    endif
+  endif
+
+  # If the FDO profile directory can't be found, then FDO is off.
+  ifneq ($(strip $(wildcard $(TARGET_FDO_PROFILE_PATH))),)
+    TARGET_FDO_CFLAGS := -fprofile-use=$(TARGET_FDO_PROFILE_PATH) -DANDROID_FDO
+    TARGET_FDO_LIB := $(target_libgcov)
+  endif
+endif
+
 # unless CUSTOM_KERNEL_HEADERS is defined, we're going to use
 # symlinks located in out/ to point to the appropriate kernel
 # headers. see 'config/kernel_headers.make' for more details
@@ -80,8 +110,8 @@ ifneq ($(CUSTOM_KERNEL_HEADERS),)
     KERNEL_HEADERS_COMMON := $(CUSTOM_KERNEL_HEADERS)
     KERNEL_HEADERS_ARCH   := $(CUSTOM_KERNEL_HEADERS)
 else
-    KERNEL_HEADERS_COMMON := $(libc_root)/kernel/common
-    KERNEL_HEADERS_ARCH   := $(libc_root)/kernel/arch-$(TARGET_ARCH)
+    KERNEL_HEADERS_COMMON := $(libc_root)/kernel/uapi
+    KERNEL_HEADERS_ARCH   := $(libc_root)/kernel/uapi/asm-$(TARGET_ARCH)
 endif
 KERNEL_HEADERS := $(KERNEL_HEADERS_COMMON) $(KERNEL_HEADERS_ARCH)
 
@@ -104,54 +134,37 @@ TARGET_GLOBAL_CFLAGS += \
 			-funswitch-loops \
 			-funwind-tables \
 			-fstack-protector \
+			-m32 \
 			-include $(android_config_h) \
 			-I $(dir $(android_config_h))
 
-# XXX: Not sure this is still needed. Must check with our toolchains.
-TARGET_GLOBAL_CPPFLAGS += \
-			-fno-use-cxa-atexit
-
-# XXX: Our toolchain is normally configured to always set these flags by default
-# however, there have been reports that this is sometimes not the case. So make
-# them explicit here unless we have the time to carefully check it
-#
-TARGET_GLOBAL_CFLAGS += -mstackrealign -msse3 -mfpmath=sse -m32
-
-# XXX: These flags should not be defined here anymore. Instead, the Android.mk
-# of the modules that depend on these features should instead check the
-# corresponding macros (e.g. ARCH_X86_HAVE_SSE2 and ARCH_X86_HAVE_SSSE3)
-# Keep them here until this is all cleared up.
-#
-ifeq ($(ARCH_X86_HAVE_SSE2),true)
-TARGET_GLOBAL_CFLAGS += -DUSE_SSE2
-endif
+TARGET_GLOBAL_CFLAGS += $(arch_variant_cflags)
 
 ifeq ($(ARCH_X86_HAVE_SSSE3),true)   # yes, really SSSE3, not SSE3!
-TARGET_GLOBAL_CFLAGS += -DUSE_SSSE3
+    TARGET_GLOBAL_CFLAGS += -DUSE_SSSE3 -mssse3
+endif
+ifeq ($(ARCH_X86_HAVE_SSE4),true)
+    TARGET_GLOBAL_CFLAGS += -msse4
+endif
+ifeq ($(ARCH_X86_HAVE_SSE4_1),true)
+    TARGET_GLOBAL_CFLAGS += -msse4.1
+endif
+ifeq ($(ARCH_X86_HAVE_SSE4_2),true)
+    TARGET_GLOBAL_CFLAGS += -msse4.2
+endif
+ifeq ($(ARCH_X86_HAVE_AVX),true)
+    TARGET_GLOBAL_CFLAGS += -mavx
+endif
+ifeq ($(ARCH_X86_HAVE_AES_NI),true)
+    TARGET_GLOBAL_CFLAGS += -maes
 endif
 
-# XXX: This flag is probably redundant. I believe our toolchain always sets
-# it by default. Consider for removal.
-#
-TARGET_GLOBAL_CFLAGS += -mbionic
-
-# XXX: This flag is probably redundant. The macro should be defined by our
-# toolchain binaries automatically (as a compiler built-in).
-# Check with: $BINPREFIX-gcc -dM -E < /dev/null
-#
-# Consider for removal.
-#
-TARGET_GLOBAL_CFLAGS += -D__ANDROID__
-
-# XXX: This flag is probably redundant since our toolchain binaries already
-# generate 32-bit machine code. It probably dates back to the old days
-# where we were using the host toolchain on Linux to build the platform
-# images. Consider it for removal.
 TARGET_GLOBAL_LDFLAGS += -m32
 
 TARGET_GLOBAL_LDFLAGS += -Wl,-z,noexecstack
 TARGET_GLOBAL_LDFLAGS += -Wl,-z,relro -Wl,-z,now
 TARGET_GLOBAL_LDFLAGS += -Wl,--warn-shared-textrel
+TARGET_GLOBAL_LDFLAGS += -Wl,--fatal-warnings
 TARGET_GLOBAL_LDFLAGS += -Wl,--gc-sections
 
 TARGET_C_INCLUDES := \
@@ -191,6 +204,7 @@ $(hide) $(PRIVATE_CXX) \
 	$(call normalize-target-libraries,$(PRIVATE_ALL_STATIC_LIBRARIES)) \
 	$(if $(PRIVATE_GROUP_STATIC_LIBRARIES),-Wl$(comma)--end-group) \
 	$(PRIVATE_TARGET_LIBGCC) \
+	$(PRIVATE_TARGET_FDO_LIB) \
 	$(call normalize-target-libraries,$(PRIVATE_ALL_SHARED_LIBRARIES)) \
 	-o $@ \
 	$(PRIVATE_LDFLAGS) \
@@ -202,7 +216,6 @@ define transform-o-to-executable-inner
 $(hide) $(PRIVATE_CXX) \
 	$(PRIVATE_TARGET_GLOBAL_LDFLAGS) \
 	-nostdlib -Bdynamic \
-	-Wl,-dynamic-linker,/system/bin/linker \
 	-Wl,-z,nocopyreloc \
 	-fPIE -pie \
 	$(PRIVATE_TARGET_GLOBAL_LD_DIRS) \
@@ -216,6 +229,7 @@ $(hide) $(PRIVATE_CXX) \
 	$(call normalize-target-libraries,$(PRIVATE_ALL_STATIC_LIBRARIES)) \
 	$(if $(PRIVATE_GROUP_STATIC_LIBRARIES),-Wl$(comma)--end-group) \
 	$(PRIVATE_TARGET_LIBGCC) \
+	$(PRIVATE_TARGET_FDO_LIB) \
 	$(call normalize-target-libraries,$(PRIVATE_ALL_SHARED_LIBRARIES)) \
 	-o $@ \
 	$(PRIVATE_LDFLAGS) \
@@ -237,25 +251,8 @@ $(hide) $(PRIVATE_CXX) \
 	-Wl,--no-whole-archive \
 	-Wl,--start-group \
 	$(call normalize-target-libraries,$(PRIVATE_ALL_STATIC_LIBRARIES)) \
+	$(PRIVATE_TARGET_FDO_LIB) \
 	$(PRIVATE_TARGET_LIBGCC) \
 	-Wl,--end-group \
 	$(if $(filter true,$(PRIVATE_NO_CRT)),,$(PRIVATE_TARGET_CRTEND_O))
 endef
-
-# Special check for x86 NDK ABI compatibility.
-# The TARGET_CPU_ABI variable should be defined in BoardConfig.mk to 'x86'
-# *only* if the platform image is compatible with the NDK x86 ABI.
-#
-# We perform a small check here to ensure that nothing bad can happen.
-#
-ifeq ($(TARGET_CPU_ABI),x86)
-  ifneq (true-true-true-true,$(ARCH_X86_HAVE_MMX)-$(ARCH_X86_HAVE_SSE)-$(ARCH_X86_HAVE_SSE2)-$(ARCH_X86_HAVE_SSE3))
-    $(info ERROR: Your x86 platform image is not compatible with the NDK x86 ABI)
-    $(info As such, you should *not* define TARGET_CPU_ABI to 'x86' in your BoardConfig.mk)
-    $(info to ensure that your device will not be mistakenly listed as compatible by
-    $(info the Android Market. Also, it is likely that the image will fail the CTS tests)
-    $(info Please undefine TARGET_CPU_ABI in your BoardConfig.mk, or select the value 'none')
-    $(info The corresponding image will still be able to run Dalvik-based Android applications)
-    $(error Aborting build! Please fix your BoardConfig.mk)
-  endif
-endif

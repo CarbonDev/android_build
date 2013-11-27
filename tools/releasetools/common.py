@@ -287,8 +287,12 @@ def BuildBootableImage(sourcedir, fs_config_file, info_dict=None):
   assert p1.returncode == 0, "mkbootfs of %s ramdisk failed" % (targetname,)
   assert p2.returncode == 0, "minigzip of %s ramdisk failed" % (targetname,)
 
-  """check if uboot is requested"""
-  fn = os.path.join(sourcedir, "ubootargs")
+  # use MKBOOTIMG from environ, or "mkbootimg" if empty or not set
+  mkbootimg = os.getenv('MKBOOTIMG') or "mkbootimg"
+
+  cmd = [mkbootimg, "--kernel", os.path.join(sourcedir, "kernel")]
+
+  fn = os.path.join(sourcedir, "cmdline")
   if os.access(fn, os.F_OK):
     cmd = ["mkimage"]
     for argument in open(fn).read().rstrip("\n").split(" "):
@@ -315,9 +319,9 @@ def BuildBootableImage(sourcedir, fs_config_file, info_dict=None):
       cmd.append("--pagesize")
       cmd.append(open(fn).read().rstrip("\n"))
 
-    args = info_dict.get("mkbootimg_args", None)
-    if args and args.strip():
-      cmd.extend(args.split())
+  args = info_dict.get("mkbootimg_args", None)
+  if args and args.strip():
+    cmd.extend(shlex.split(args))
 
     cmd.extend(["--ramdisk", ramdisk_img.name,
                 "--output", img.name])
@@ -978,3 +982,18 @@ def GetTypeAndDevice(mount_point, info):
     return PARTITION_TYPES[fstab[mount_point].fs_type], fstab[mount_point].device
   else:
     return None
+
+
+def ParseCertificate(data):
+  """Parse a PEM-format certificate."""
+  cert = []
+  save = False
+  for line in data.split("\n"):
+    if "--END CERTIFICATE--" in line:
+      break
+    if save:
+      cert.append(line)
+    if "--BEGIN CERTIFICATE--" in line:
+      save = True
+  cert = "".join(cert).decode('base64')
+  return cert
