@@ -48,7 +48,6 @@ $(warning *  see https://source.android.com/source/download.html)
 $(warning ********************************************************************************)
 endif
 endif
-endif
 
 # Absolute path of the present working direcotry.
 # This overrides the shell variable $PWD, which does not necessarily points to
