@@ -1487,9 +1487,9 @@ function crremote()
     CRUSER=`git config --get review.review.carbon-rom.com.username`
     if [ -z "$CRUSER" ]
     then
-        git remote add crremote ssh://review.carbon-rom.com:29412/$GERRIT_REMOTE
+        git remote add crremote ssh://review.carbon-rom.com:29418/$GERRIT_REMOTE
     else
-        git remote add crremote ssh://$CRUSER@review.carbon-rom.com:29412/$GERRIT_REMOTE
+        git remote add crremote ssh://$CRUSER@review.carbon-rom.com:29418/$GERRIT_REMOTE
     fi
     echo You can now push to "crremote".
 }
