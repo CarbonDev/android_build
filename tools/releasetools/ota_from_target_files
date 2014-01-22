@@ -454,28 +454,26 @@ def WriteFullOTAPackage(input_zip, output_zip):
     script.FormatPartition("/data")
 
   script.Print("                                        ");
-  script.Print("                8OOOO8                  ");
-  script.Print("           88888O88O888888D             ");
-  script.Print("         88888888888888888888           ");
-  script.Print("       8888888888888888888888D8         ");
-  script.Print("     8DD8888888888888888888D8DDD        ");
-  script.Print("    DDDDDD8888888888888888DDDD          ");
-  script.Print("   DDDDDDDD8           NDDDD8           ");
-  script.Print("   DDDDDD                 D             ");
-  script.Print("  DDDDDD N                              ");
-  script.Print("  DDDD  NN                              ");
-  script.Print("  NND  NNN                              ");
-  script.Print("  NNN NNNN                              ");
-  script.Print("  NN  NNNN                              ");
-  script.Print("  NN NNNNDN                             ");
-  script.Print("   N NNNDNN8                        D   ");
-  script.Print("   N NNDN  D8                     NN    ");
-  script.Print("    N 8  D8  DD                  DD8    ");
-  script.Print("      NNN   DD  DN                      ");
-  script.Print("          DDN  DDN  NDDDDD              ");
-  script.Print("         NNN  NDD8   DDDDDD             ");
-  script.Print("              DDD    DDDDDDD            ");
-  script.Print("              DDD    DDDDND             ");
+  script.Print("                                        ");
+  script.Print("            ..;codxxddl:,.              ");
+  script.Print("        .,d0WMMMMMMMMMMMMMXkc.          ");
+  script.Print("      .dNMMMMMMMMMMMMMMMMMMMMM0:        ");
+  script.Print("    .kMMMMMMMMMMMMMMMMMMMMMMMMMMX.      ");
+  script.Print("   :WMMMMMMMMMMWNXXNWMMMMMMMMMMk'       ");
+  script.Print("  lMMMMMMMXxc,.      .,cxXMMWx.         ");
+  script.Print(" ;MMMMMW`'              ;'7l;           ");
+  script.Print(" KMMMM7 d;               `;`            ");
+  script.Print(".MMMW .mM:                              ");
+  script.Print("'MMM ,MMlx                              ");
+  script.Print(".WMO nMMMW'                           .l");
+  script.Print(" dMl MMMMMN'                         .x.");
+  script.Print(" .Xl MMMMMMWl.                      ;N; ");
+  script.Print("  .d`MMMMMMMMXc.                 .:KMo  ");
+  script.Print("   ..dMMMMMMMMMWOl'.         .. .XMW:   ");
+  script.Print("      ;KMMMMMMMMMMMMX0kxxxkOKW .0Mk.    ");
+  script.Print("       .;OMMMMMMMMMMMMMMMMMMK ;Kd.      ");
+  script.Print("          .:xXMMMMMMMMMMMWk  ,SP        ");
+  script.Print("             .':lodxddltl7` d'`         ");
   script.Print("                                        ");
   script.Print("                                        ");
 
