@@ -674,7 +674,7 @@ function tapas()
 function eat()
 {
     if [ "$OUT" ] ; then
-        MODVERSION=$(get_build_var CCARBON_VERSION)
+        MODVERSION=$(get_build_var CARBON_VERSION)
         ZIPFILE=carbon-$MODVERSION.zip
         ZIPPATH=$OUT/$ZIPFILE
         if [ ! -f $ZIPPATH ] ; then
