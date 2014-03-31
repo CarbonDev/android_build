@@ -23,8 +23,7 @@ PRODUCT_PACKAGES := \
 	Email \
 	Exchange2 \
 	FusedLocation \
-	Gallery \
-	Apollo \
+	Gallery2 \
 	Keyguard \
 	Mms \
 	OpenWnn \
@@ -37,7 +36,6 @@ PRODUCT_PACKAGES := \
 	libjni_pinyinime \
 	SoftKeyboard \
 	SystemUI \
-	Trebuchet \
 	Development \
 	DevelopmentSettings \
 	Fallback \
