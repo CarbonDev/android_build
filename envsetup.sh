@@ -1484,12 +1484,12 @@ function crremote()
           return 0
         fi
     fi
-    CRUSER=`git config --get review.review.carbon-rom.com.username`
+    CRUSER=`git config --get review.review.carbonrom.org.username`
     if [ -z "$CRUSER" ]
     then
-        git remote add crremote ssh://review.carbon-rom.com:29418/$GERRIT_REMOTE
+        git remote add crremote ssh://review.carbonrom.org:29418/$GERRIT_REMOTE
     else
-        git remote add crremote ssh://$CRUSER@review.carbon-rom.com:29418/$GERRIT_REMOTE
+        git remote add crremote ssh://$CRUSER@review.carbonrom.org:29418/$GERRIT_REMOTE
     fi
     echo You can now push to "crremote".
 }
@@ -1524,7 +1524,7 @@ function crrebase() {
     echo "Bringing it up to date..."
     repo sync .
     echo "Fetching change..."
-    git fetch "http://review.carbon-rom.com/p/$repo" "refs/changes/$refs" && git cherry-pick FETCH_HEAD
+    git fetch "http://review.carbonrom.org/p/$repo" "refs/changes/$refs" && git cherry-pick FETCH_HEAD
     if [ "$?" != "0" ]; then
         echo "Error cherry-picking. Not uploading!"
         return
