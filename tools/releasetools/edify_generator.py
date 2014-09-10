@@ -133,7 +133,7 @@ class EdifyGenerator(object):
 
   def RunPersist(self, arg):
     self.script.append('package_extract_file("install/bin/persist.sh", "/tmp/persist.sh");')
-    self.script.append('set_perm(0, 0, 0777, "/tmp/persist.sh");')
+    self.script.append('#set_perm(0, 0, 0777, "/tmp/persist.sh");')
     self.script.append(('run_program("/tmp/persist.sh", "%s");' % arg))
 
   def ShowProgress(self, frac, dur):
